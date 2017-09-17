@@ -9,7 +9,7 @@ var path = require('path'),
 
 module.exports.init = function() {
   //connect to database
-  mongoose.connect(config.db.uri);
+  mongoose.connect(config.db.uri,{useMongoClient:true});
 
   //initialize app
   var app = express();
@@ -26,12 +26,26 @@ module.exports.init = function() {
   });
 
   /* serve static files */
-  
+  app.use(express.static('client'))
 
   /* use the listings router for requests to the api */
+    app.use('/api/listings',listingsRouter);
 
+
+  /*
+  app.get('api/listings', function(req, res) {
+      res.send(listingData);
+    });
+
+app.all('/*', function(req, res) {
+  res.status(404).send('Bad gateway error');
+});
+*/
 
   /* go to homepage for all routes not specified */ 
+  app.all('/*', function(req, res) {
+    res.sendFile(path.resolve('client/index.html'));
+  });
 
   return app;
 };  
